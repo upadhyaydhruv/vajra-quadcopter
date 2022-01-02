@@ -631,7 +631,7 @@ F 3 "~" H 2100 4100 50  0001 C CNN
 	-1   0    0    1   
 $EndComp
 $Comp
-L Regulator_Linear:LM2931-3.3_TO220 U?
+L Quadcopter_FCU-rescue:LM2931-3.3_TO220-Regulator_Linear U?
 U 1 1 619CB9E6
 P 3800 1800
 F 0 "U?" H 3800 2042 50  0000 C CNN
