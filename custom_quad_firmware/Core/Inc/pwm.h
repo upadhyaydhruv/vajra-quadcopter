@@ -21,12 +21,5 @@ Motor 3: Back Left
 Motor 4: Back Right
 */
 
-void setMotor1(uint8_t dutyCyclePercentage);
-
-void setMotor2(uint8_t dutyCyclePercentage);
-
-void setMotor3(uint8_t dutyCyclePercentage);
-
-void setMotor4(uint8_t dutyCyclePercentage);
-
+void setMotorPower(uint8_t dutyCyclePercentage, uint8_t motorNum);
 #endif

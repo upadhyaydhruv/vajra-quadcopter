@@ -6,6 +6,9 @@
 #include <stdint.h>
 
 #define NUM_CHANNELS (4UL)
+#define TIMER_HIGH_MS 2
+#define TIMER_LOW_MS = 1
+#define PERIOD_MS 20
 
 typedef struct PWMPinConfig {
     uint8_t GPIOOutputNum;
@@ -53,6 +56,19 @@ void pwmInit() {
     timerInit(); 
 }
 
-void setMotor1(uint8_t dutyCyclePercentage){
-    
+/*
+Setting duty cycle based on power percentage, from 0 to 100
+
+PWM frequency of motor is set to 50 Hz
+
+Duty cycle is set such that the on-time is from 1ms to 2ms, implying 5-10% duty cyle:
+5% duty cycle = 0% throttle (1ms)
+10% duty cycle = 100% throttle (2ms)
+*/
+
+void setMotorPower(uint8_t dutyCyclePercentage, uint8_t motorNum){
+    PWMPinConfig_t * motorPWM = &PWMPinConfig[motorNum-1];
+    float compareVal = (dutyCyclePercentage * (TIMER_HIGH_MS - TIMER_LOW_MS) + TIMER_LOW_MS) * motorPWM->timer.Period / (float) PERIOD_MS;
+
+    __HAL_TIM_SET_COMPARE(motorPWM->timer, motorPWM->channel; compareVal);
 }
