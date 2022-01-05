@@ -1,13 +1,13 @@
 #include "pwm.h"
 #include "main.h"
+#include "stm32f4xx_hal.h"
 
-#include <bits/stdint-uintn.h>
 #include <stdbool.h>
 #include <stdint.h>
 
 #define NUM_CHANNELS (4UL)
 #define TIMER_HIGH_MS 2
-#define TIMER_LOW_MS = 1
+#define TIMER_LOW_MS 1
 #define PERIOD_MS 20
 
 typedef struct PWMPinConfig {
@@ -17,7 +17,7 @@ typedef struct PWMPinConfig {
     uint8_t channel;
 } PWMPinConfig_t;
 
-static PWMPinConfig[NUM_CHANNELS] = {
+static PWMPinConfig_t PWMPinConfig[NUM_CHANNELS] = {
     {.GPIOOutputNum = PWM_1_Pin,
      .GPIOOutputPort = PWM_1_GPIO_Port,
      .timer = &htim1,
@@ -45,7 +45,8 @@ void timerInit() {
         PWMPinConfig_t *PWMChannel = &PWMPinConfig[i];
 
         // Initializing the PWM timer at these channels
-        HAL_PWM_Start(PWMChannel->timer, PWMChannel->channel);
+        HAL_TIM_PWM_Init(PWMChannel->timer);
+        HAL_TIM_PWM_Start(PWMChannel->timer, PWMChannel->channel);
 
         // Setting the duty cycle for the specific channel to be 0, implying no motor movement
         __HAL_TIM_SET_COMPARE(PWMChannel->timer, PWMChannel->channel, 0);
@@ -68,7 +69,7 @@ Duty cycle is set such that the on-time is from 1ms to 2ms, implying 5-10% duty 
 
 void setMotorPower(uint8_t dutyCyclePercentage, uint8_t motorNum){
     PWMPinConfig_t * motorPWM = &PWMPinConfig[motorNum-1];
-    float compareVal = (dutyCyclePercentage * (TIMER_HIGH_MS - TIMER_LOW_MS) + TIMER_LOW_MS) * motorPWM->timer.Period / (float) PERIOD_MS;
+    float compareVal = (dutyCyclePercentage * (TIMER_HIGH_MS - TIMER_LOW_MS) + TIMER_LOW_MS) * motorPWM->timer->Init.Period / (float) PERIOD_MS;
 
-    __HAL_TIM_SET_COMPARE(motorPWM->timer, motorPWM->channel; compareVal);
+    __HAL_TIM_SET_COMPARE(motorPWM->timer, motorPWM->channel, compareVal);
 }

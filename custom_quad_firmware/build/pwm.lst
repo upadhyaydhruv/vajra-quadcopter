@@ -1,0 +1,415 @@
+ARM GAS  /tmp/ccBgkfqG.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.eabi_attribute 27, 1
+   3              		.eabi_attribute 28, 1
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"pwm.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.timerInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	timerInit
+  20              		.arch armv7e-m
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  24              		.fpu fpv4-sp-d16
+  26              	timerInit:
+  27              	.LFB130:
+  28              		.file 1 "Core/Src/pwm.c"
+   1:Core/Src/pwm.c **** #include "pwm.h"
+   2:Core/Src/pwm.c **** #include "main.h"
+   3:Core/Src/pwm.c **** #include "stm32f4xx_hal.h"
+   4:Core/Src/pwm.c **** 
+   5:Core/Src/pwm.c **** #include <stdbool.h>
+   6:Core/Src/pwm.c **** #include <stdint.h>
+   7:Core/Src/pwm.c **** 
+   8:Core/Src/pwm.c **** #define NUM_CHANNELS (4UL)
+   9:Core/Src/pwm.c **** #define TIMER_HIGH_MS 2
+  10:Core/Src/pwm.c **** #define TIMER_LOW_MS 1
+  11:Core/Src/pwm.c **** #define PERIOD_MS 20
+  12:Core/Src/pwm.c **** 
+  13:Core/Src/pwm.c **** typedef struct PWMPinConfig {
+  14:Core/Src/pwm.c ****     uint8_t GPIOOutputNum;
+  15:Core/Src/pwm.c ****     GPIO_TypeDef *GPIOOutputPort;
+  16:Core/Src/pwm.c ****     TIM_HandleTypeDef *timer;
+  17:Core/Src/pwm.c ****     uint8_t channel;
+  18:Core/Src/pwm.c **** } PWMPinConfig_t;
+  19:Core/Src/pwm.c **** 
+  20:Core/Src/pwm.c **** static PWMPinConfig_t PWMPinConfig[NUM_CHANNELS] = {
+  21:Core/Src/pwm.c ****     {.GPIOOutputNum = PWM_1_Pin,
+  22:Core/Src/pwm.c ****      .GPIOOutputPort = PWM_1_GPIO_Port,
+  23:Core/Src/pwm.c ****      .timer = &htim1,
+  24:Core/Src/pwm.c ****      .channel = TIM_CHANNEL_1},
+  25:Core/Src/pwm.c **** 
+  26:Core/Src/pwm.c ****     {.GPIOOutputNum = PWM_2_Pin,
+  27:Core/Src/pwm.c ****      .GPIOOutputPort = PWM_2_GPIO_Port,
+  28:Core/Src/pwm.c ****      .timer = &htim1,
+  29:Core/Src/pwm.c ****      .channel = TIM_CHANNEL_2},
+  30:Core/Src/pwm.c **** 
+ARM GAS  /tmp/ccBgkfqG.s 			page 2
+
+
+  31:Core/Src/pwm.c ****     {.GPIOOutputNum = PWM_3_Pin,
+  32:Core/Src/pwm.c ****      .GPIOOutputPort = PWM_3_GPIO_Port,
+  33:Core/Src/pwm.c ****      .timer = &htim1,
+  34:Core/Src/pwm.c ****      .channel = TIM_CHANNEL_3},
+  35:Core/Src/pwm.c **** 
+  36:Core/Src/pwm.c ****     {.GPIOOutputNum = PWM_4_Pin,
+  37:Core/Src/pwm.c ****      .GPIOOutputPort = PWM_4_GPIO_Port,
+  38:Core/Src/pwm.c ****      .timer = &htim1,
+  39:Core/Src/pwm.c ****      .channel = TIM_CHANNEL_4},
+  40:Core/Src/pwm.c **** 
+  41:Core/Src/pwm.c **** };
+  42:Core/Src/pwm.c **** 
+  43:Core/Src/pwm.c **** void timerInit() {
+  29              		.loc 1 43 18 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 70B5     		push	{r4, r5, r6, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 16
+  36              		.cfi_offset 4, -16
+  37              		.cfi_offset 5, -12
+  38              		.cfi_offset 6, -8
+  39              		.cfi_offset 14, -4
+  44:Core/Src/pwm.c ****     for (int i = 0; i < NUM_CHANNELS; i++) {
+  40              		.loc 1 44 5 view .LVU1
+  41              	.LBB2:
+  42              		.loc 1 44 10 view .LVU2
+  43              	.LVL0:
+  44              		.loc 1 44 14 is_stmt 0 view .LVU3
+  45 0002 0024     		movs	r4, #0
+  46              		.loc 1 44 5 view .LVU4
+  47 0004 0BE0     		b	.L2
+  48              	.LVL1:
+  49              	.L3:
+  50              	.LBB3:
+  45:Core/Src/pwm.c ****         PWMPinConfig_t *PWMChannel = &PWMPinConfig[i];
+  46:Core/Src/pwm.c **** 
+  47:Core/Src/pwm.c ****         // Initializing the PWM timer at these channels
+  48:Core/Src/pwm.c ****         HAL_TIM_PWM_Init(PWMChannel->timer);
+  49:Core/Src/pwm.c ****         HAL_TIM_PWM_Start(PWMChannel->timer, PWMChannel->channel);
+  50:Core/Src/pwm.c **** 
+  51:Core/Src/pwm.c ****         // Setting the duty cycle for the specific channel to be 0, implying no motor movement
+  52:Core/Src/pwm.c ****         __HAL_TIM_SET_COMPARE(PWMChannel->timer, PWMChannel->channel, 0);
+  51              		.loc 1 52 9 discriminator 2 view .LVU5
+  52 0006 042D     		cmp	r5, #4
+  53 0008 21D0     		beq	.L9
+  54              		.loc 1 52 9 discriminator 4 view .LVU6
+  55 000a 082D     		cmp	r5, #8
+  56 000c 27D0     		beq	.L10
+  57              		.loc 1 52 9 discriminator 7 view .LVU7
+  58 000e 184B     		ldr	r3, .L12
+  59 0010 03EB0413 		add	r3, r3, r4, lsl #4
+  60 0014 9B68     		ldr	r3, [r3, #8]
+  61 0016 1B68     		ldr	r3, [r3]
+  62 0018 0022     		movs	r2, #0
+  63 001a 1A64     		str	r2, [r3, #64]
+ARM GAS  /tmp/ccBgkfqG.s 			page 3
+
+
+  64              	.L4:
+  65              		.loc 1 52 9 discriminator 7 view .LVU8
+  66              	.LBE3:
+  44:Core/Src/pwm.c ****     for (int i = 0; i < NUM_CHANNELS; i++) {
+  67              		.loc 1 44 39 is_stmt 1 discriminator 2 view .LVU9
+  44:Core/Src/pwm.c ****     for (int i = 0; i < NUM_CHANNELS; i++) {
+  68              		.loc 1 44 40 is_stmt 0 discriminator 2 view .LVU10
+  69 001c 0134     		adds	r4, r4, #1
+  70              	.LVL2:
+  71              	.L2:
+  44:Core/Src/pwm.c ****     for (int i = 0; i < NUM_CHANNELS; i++) {
+  72              		.loc 1 44 21 is_stmt 1 discriminator 1 view .LVU11
+  44:Core/Src/pwm.c ****     for (int i = 0; i < NUM_CHANNELS; i++) {
+  73              		.loc 1 44 5 is_stmt 0 discriminator 1 view .LVU12
+  74 001e 032C     		cmp	r4, #3
+  75 0020 25D8     		bhi	.L11
+  76              	.LBB4:
+  45:Core/Src/pwm.c ****         PWMPinConfig_t *PWMChannel = &PWMPinConfig[i];
+  77              		.loc 1 45 9 is_stmt 1 view .LVU13
+  78              	.LVL3:
+  48:Core/Src/pwm.c ****         HAL_TIM_PWM_Start(PWMChannel->timer, PWMChannel->channel);
+  79              		.loc 1 48 9 view .LVU14
+  80 0022 134D     		ldr	r5, .L12
+  81 0024 05EB0415 		add	r5, r5, r4, lsl #4
+  82 0028 AE68     		ldr	r6, [r5, #8]
+  83 002a 3046     		mov	r0, r6
+  84 002c FFF7FEFF 		bl	HAL_TIM_PWM_Init
+  85              	.LVL4:
+  49:Core/Src/pwm.c **** 
+  86              		.loc 1 49 9 view .LVU15
+  49:Core/Src/pwm.c **** 
+  87              		.loc 1 49 56 is_stmt 0 view .LVU16
+  88 0030 2D7B     		ldrb	r5, [r5, #12]	@ zero_extendqisi2
+  49:Core/Src/pwm.c **** 
+  89              		.loc 1 49 9 view .LVU17
+  90 0032 2946     		mov	r1, r5
+  91 0034 3046     		mov	r0, r6
+  92 0036 FFF7FEFF 		bl	HAL_TIM_PWM_Start
+  93              	.LVL5:
+  94              		.loc 1 52 9 is_stmt 1 view .LVU18
+  95 003a 002D     		cmp	r5, #0
+  96 003c E3D1     		bne	.L3
+  97              		.loc 1 52 9 is_stmt 0 discriminator 1 view .LVU19
+  98 003e 0C4B     		ldr	r3, .L12
+  99 0040 03EB0413 		add	r3, r3, r4, lsl #4
+ 100 0044 9B68     		ldr	r3, [r3, #8]
+ 101 0046 1B68     		ldr	r3, [r3]
+ 102 0048 0022     		movs	r2, #0
+ 103 004a 5A63     		str	r2, [r3, #52]
+ 104 004c E6E7     		b	.L4
+ 105              	.L9:
+ 106              		.loc 1 52 9 discriminator 3 view .LVU20
+ 107 004e 084B     		ldr	r3, .L12
+ 108 0050 03EB0413 		add	r3, r3, r4, lsl #4
+ 109 0054 9B68     		ldr	r3, [r3, #8]
+ 110 0056 1B68     		ldr	r3, [r3]
+ 111 0058 0022     		movs	r2, #0
+ARM GAS  /tmp/ccBgkfqG.s 			page 4
+
+
+ 112 005a 9A63     		str	r2, [r3, #56]
+ 113 005c DEE7     		b	.L4
+ 114              	.L10:
+ 115              		.loc 1 52 9 discriminator 6 view .LVU21
+ 116 005e 044B     		ldr	r3, .L12
+ 117 0060 03EB0413 		add	r3, r3, r4, lsl #4
+ 118 0064 9B68     		ldr	r3, [r3, #8]
+ 119 0066 1B68     		ldr	r3, [r3]
+ 120 0068 0022     		movs	r2, #0
+ 121 006a DA63     		str	r2, [r3, #60]
+ 122 006c D6E7     		b	.L4
+ 123              	.LVL6:
+ 124              	.L11:
+ 125              		.loc 1 52 9 discriminator 6 view .LVU22
+ 126              	.LBE4:
+ 127              	.LBE2:
+  53:Core/Src/pwm.c ****     }
+  54:Core/Src/pwm.c **** }
+ 128              		.loc 1 54 1 view .LVU23
+ 129 006e 70BD     		pop	{r4, r5, r6, pc}
+ 130              	.LVL7:
+ 131              	.L13:
+ 132              		.loc 1 54 1 view .LVU24
+ 133              		.align	2
+ 134              	.L12:
+ 135 0070 00000000 		.word	.LANCHOR0
+ 136              		.cfi_endproc
+ 137              	.LFE130:
+ 139              		.section	.text.pwmInit,"ax",%progbits
+ 140              		.align	1
+ 141              		.global	pwmInit
+ 142              		.syntax unified
+ 143              		.thumb
+ 144              		.thumb_func
+ 145              		.fpu fpv4-sp-d16
+ 147              	pwmInit:
+ 148              	.LFB131:
+  55:Core/Src/pwm.c **** 
+  56:Core/Src/pwm.c **** void pwmInit() {
+ 149              		.loc 1 56 16 is_stmt 1 view -0
+ 150              		.cfi_startproc
+ 151              		@ args = 0, pretend = 0, frame = 0
+ 152              		@ frame_needed = 0, uses_anonymous_args = 0
+ 153 0000 08B5     		push	{r3, lr}
+ 154              	.LCFI1:
+ 155              		.cfi_def_cfa_offset 8
+ 156              		.cfi_offset 3, -8
+ 157              		.cfi_offset 14, -4
+  57:Core/Src/pwm.c ****     timerInit(); 
+ 158              		.loc 1 57 5 view .LVU26
+ 159 0002 FFF7FEFF 		bl	timerInit
+ 160              	.LVL8:
+  58:Core/Src/pwm.c **** }
+ 161              		.loc 1 58 1 is_stmt 0 view .LVU27
+ 162 0006 08BD     		pop	{r3, pc}
+ 163              		.cfi_endproc
+ 164              	.LFE131:
+ARM GAS  /tmp/ccBgkfqG.s 			page 5
+
+
+ 166              		.section	.text.setMotorPower,"ax",%progbits
+ 167              		.align	1
+ 168              		.global	setMotorPower
+ 169              		.syntax unified
+ 170              		.thumb
+ 171              		.thumb_func
+ 172              		.fpu fpv4-sp-d16
+ 174              	setMotorPower:
+ 175              	.LVL9:
+ 176              	.LFB132:
+  59:Core/Src/pwm.c **** 
+  60:Core/Src/pwm.c **** /*
+  61:Core/Src/pwm.c **** Setting duty cycle based on power percentage, from 0 to 100
+  62:Core/Src/pwm.c **** 
+  63:Core/Src/pwm.c **** PWM frequency of motor is set to 50 Hz
+  64:Core/Src/pwm.c **** 
+  65:Core/Src/pwm.c **** Duty cycle is set such that the on-time is from 1ms to 2ms, implying 5-10% duty cyle:
+  66:Core/Src/pwm.c **** 5% duty cycle = 0% throttle (1ms)
+  67:Core/Src/pwm.c **** 10% duty cycle = 100% throttle (2ms)
+  68:Core/Src/pwm.c **** */
+  69:Core/Src/pwm.c **** 
+  70:Core/Src/pwm.c **** void setMotorPower(uint8_t dutyCyclePercentage, uint8_t motorNum){
+ 177              		.loc 1 70 66 is_stmt 1 view -0
+ 178              		.cfi_startproc
+ 179              		@ args = 0, pretend = 0, frame = 0
+ 180              		@ frame_needed = 0, uses_anonymous_args = 0
+ 181              		@ link register save eliminated.
+  71:Core/Src/pwm.c ****     PWMPinConfig_t * motorPWM = &PWMPinConfig[motorNum-1];
+ 182              		.loc 1 71 5 view .LVU29
+ 183              		.loc 1 71 55 is_stmt 0 view .LVU30
+ 184 0000 4A1E     		subs	r2, r1, #1
+ 185              	.LVL10:
+  72:Core/Src/pwm.c ****     float compareVal = (dutyCyclePercentage * (TIMER_HIGH_MS - TIMER_LOW_MS) + TIMER_LOW_MS) * moto
+ 186              		.loc 1 72 5 is_stmt 1 view .LVU31
+ 187              		.loc 1 72 104 is_stmt 0 view .LVU32
+ 188 0002 1649     		ldr	r1, .L23
+ 189              	.LVL11:
+ 190              		.loc 1 72 104 view .LVU33
+ 191 0004 01EB0211 		add	r1, r1, r2, lsl #4
+ 192 0008 8A68     		ldr	r2, [r1, #8]
+ 193              	.LVL12:
+ 194              		.loc 1 72 117 view .LVU34
+ 195 000a D368     		ldr	r3, [r2, #12]
+ 196              		.loc 1 72 94 view .LVU35
+ 197 000c 00FB0333 		mla	r3, r0, r3, r3
+ 198              		.loc 1 72 125 view .LVU36
+ 199 0010 07EE903A 		vmov	s15, r3	@ int
+ 200 0014 F8EE677A 		vcvt.f32.u32	s15, s15
+ 201              		.loc 1 72 11 view .LVU37
+ 202 0018 F3EE046A 		vmov.f32	s13, #2.0e+1
+ 203 001c 87EEA67A 		vdiv.f32	s14, s15, s13
+ 204              	.LVL13:
+  73:Core/Src/pwm.c **** 
+  74:Core/Src/pwm.c ****     __HAL_TIM_SET_COMPARE(motorPWM->timer, motorPWM->channel, compareVal);
+ 205              		.loc 1 74 5 is_stmt 1 view .LVU38
+ 206 0020 0B7B     		ldrb	r3, [r1, #12]	@ zero_extendqisi2
+ 207 0022 2BB9     		cbnz	r3, .L17
+ARM GAS  /tmp/ccBgkfqG.s 			page 6
+
+
+ 208              		.loc 1 74 5 is_stmt 0 discriminator 1 view .LVU39
+ 209 0024 1368     		ldr	r3, [r2]
+ 210 0026 BCEEC77A 		vcvt.u32.f32	s14, s14
+ 211              	.LVL14:
+ 212              		.loc 1 74 5 discriminator 1 view .LVU40
+ 213 002a 83ED0D7A 		vstr.32	s14, [r3, #52]	@ int
+ 214 002e 7047     		bx	lr
+ 215              	.LVL15:
+ 216              	.L17:
+ 217              		.loc 1 74 5 discriminator 2 view .LVU41
+ 218 0030 042B     		cmp	r3, #4
+ 219 0032 07D0     		beq	.L21
+ 220              		.loc 1 74 5 discriminator 4 view .LVU42
+ 221 0034 082B     		cmp	r3, #8
+ 222 0036 0BD0     		beq	.L22
+ 223              		.loc 1 74 5 discriminator 7 view .LVU43
+ 224 0038 1368     		ldr	r3, [r2]
+ 225 003a BCEEC77A 		vcvt.u32.f32	s14, s14
+ 226              	.LVL16:
+ 227              		.loc 1 74 5 discriminator 7 view .LVU44
+ 228 003e 83ED107A 		vstr.32	s14, [r3, #64]	@ int
+  75:Core/Src/pwm.c **** }
+ 229              		.loc 1 75 1 discriminator 7 view .LVU45
+ 230 0042 7047     		bx	lr
+ 231              	.LVL17:
+ 232              	.L21:
+  74:Core/Src/pwm.c **** }
+ 233              		.loc 1 74 5 discriminator 3 view .LVU46
+ 234 0044 1368     		ldr	r3, [r2]
+ 235 0046 BCEEC77A 		vcvt.u32.f32	s14, s14
+ 236              	.LVL18:
+  74:Core/Src/pwm.c **** }
+ 237              		.loc 1 74 5 discriminator 3 view .LVU47
+ 238 004a 83ED0E7A 		vstr.32	s14, [r3, #56]	@ int
+ 239 004e 7047     		bx	lr
+ 240              	.LVL19:
+ 241              	.L22:
+  74:Core/Src/pwm.c **** }
+ 242              		.loc 1 74 5 discriminator 6 view .LVU48
+ 243 0050 1368     		ldr	r3, [r2]
+ 244 0052 BCEEC77A 		vcvt.u32.f32	s14, s14
+ 245              	.LVL20:
+  74:Core/Src/pwm.c **** }
+ 246              		.loc 1 74 5 discriminator 6 view .LVU49
+ 247 0056 83ED0F7A 		vstr.32	s14, [r3, #60]	@ int
+ 248 005a 7047     		bx	lr
+ 249              	.L24:
+ 250              		.align	2
+ 251              	.L23:
+ 252 005c 00000000 		.word	.LANCHOR0
+ 253              		.cfi_endproc
+ 254              	.LFE132:
+ 256              		.section	.rodata.PWMPinConfig,"a"
+ 257              		.align	2
+ 258              		.set	.LANCHOR0,. + 0
+ 261              	PWMPinConfig:
+ 262 0000 00       		.byte	0
+ARM GAS  /tmp/ccBgkfqG.s 			page 7
+
+
+ 263 0001 000000   		.space	3
+ 264 0004 00000240 		.word	1073872896
+ 265 0008 00000000 		.word	htim1
+ 266 000c 00       		.byte	0
+ 267 000d 000000   		.space	3
+ 268 0010 00       		.byte	0
+ 269 0011 000000   		.space	3
+ 270 0014 00000240 		.word	1073872896
+ 271 0018 00000000 		.word	htim1
+ 272 001c 04       		.byte	4
+ 273 001d 000000   		.space	3
+ 274 0020 00       		.byte	0
+ 275 0021 000000   		.space	3
+ 276 0024 00000240 		.word	1073872896
+ 277 0028 00000000 		.word	htim1
+ 278 002c 08       		.byte	8
+ 279 002d 000000   		.space	3
+ 280 0030 00       		.byte	0
+ 281 0031 000000   		.space	3
+ 282 0034 00000240 		.word	1073872896
+ 283 0038 00000000 		.word	htim1
+ 284 003c 0C       		.byte	12
+ 285 003d 000000   		.space	3
+ 286              		.text
+ 287              	.Letext0:
+ 288              		.file 2 "/opt/gcc-arm-none-eabi-10-2020-q4-major/arm-none-eabi/include/machine/_default_types.h"
+ 289              		.file 3 "/opt/gcc-arm-none-eabi-10-2020-q4-major/arm-none-eabi/include/sys/_stdint.h"
+ 290              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h"
+ 291              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 292              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 293              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h"
+ 294              		.file 8 "Core/Inc/main.h"
+ARM GAS  /tmp/ccBgkfqG.s 			page 8
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 pwm.c
+     /tmp/ccBgkfqG.s:18     .text.timerInit:0000000000000000 $t
+     /tmp/ccBgkfqG.s:26     .text.timerInit:0000000000000000 timerInit
+     /tmp/ccBgkfqG.s:135    .text.timerInit:0000000000000070 $d
+     /tmp/ccBgkfqG.s:140    .text.pwmInit:0000000000000000 $t
+     /tmp/ccBgkfqG.s:147    .text.pwmInit:0000000000000000 pwmInit
+     /tmp/ccBgkfqG.s:167    .text.setMotorPower:0000000000000000 $t
+     /tmp/ccBgkfqG.s:174    .text.setMotorPower:0000000000000000 setMotorPower
+     /tmp/ccBgkfqG.s:252    .text.setMotorPower:000000000000005c $d
+     /tmp/ccBgkfqG.s:257    .rodata.PWMPinConfig:0000000000000000 $d
+     /tmp/ccBgkfqG.s:261    .rodata.PWMPinConfig:0000000000000000 PWMPinConfig
+
+UNDEFINED SYMBOLS
+HAL_TIM_PWM_Init
+HAL_TIM_PWM_Start
+htim1
