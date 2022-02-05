@@ -426,7 +426,9 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-    setMotorPower(50, 1);
+    // setMotorPower(50, 1);
+    HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+    HAL_Delay(100);
   }
   /* USER CODE END Error_Handler_Debug */
 }

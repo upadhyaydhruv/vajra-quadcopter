@@ -1,3 +1,5 @@
 {
-    "stm32-for-vscode.openOCDPath": false
+    "stm32-for-vscode.openOCDPath": "/usr/bin/openocd",
+    "cortex-debug.armToolchainPath": "/opt/gcc-arm-none-eabi-10-2020-q4-major/bin",
+    "cortex-debug.openocdPath": "/usr/bin/openocd"
 }
